@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f3ee">
+<meta name="format-detection" content="telephone=no">
+<title>Widnok — okna PCV z montażem · Kraków (demo)</title>
+<meta name="description" content="Strona demonstracyjna: kalkulator okien PCV z rysunkiem okna, doradca AI z przygotowanymi odpowiedziami i zgłoszenie, które trafia do CRM i Telegrama.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Widnok — kalkulator okien PCV (demo)">
+<meta property="og:description" content="Kalkulator okien z rysunkiem, doradca AI i automatyczne zgłoszenie do CRM i Telegrama. Projekt demonstracyjny.">
+<meta property="og:url" content="https://sorteduk.github.io/widnok-demo/">
+<meta property="og:image" content="https://sorteduk.github.io/widnok-demo/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Widnok — kalkulator okien PCV z rysunkiem okna (projekt demonstracyjny)">
+<meta property="og:locale" content="pl_PL">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://sorteduk.github.io/widnok-demo/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='7' fill='%231f5fae'/%3E%3Crect x='8.5' y='8.5' width='15' height='15' rx='2' fill='none' stroke='white' stroke-width='2.2'/%3E%3Cpath d='M16 8.5v15M8.5 16h15' stroke='white' stroke-width='2.2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ee; --surface:#ffffff; --surface-2:#faf9f6; --ink:#15202b; --ink-2:#34404b; --muted:#65707b;
+  --line:#e5e1d8; --line-2:#d5cfc2;
+  --accent:#1f5fae; --accent-dark:#174a89; --accent-soft:#e7eef8; --accent-ink:#ffffff;
+  --sun:#e4892f; --sun-soft:#fcf0e2; --ok:#1d8556; --ok-soft:#e4f3ea; --err:#b93a2c; --err-soft:#fbeceb;
+  --tg:#2aabee;
+  --r:20px; --r-sm:14px; --r-xs:10px;
+  --shadow:0 1px 2px rgba(21,32,43,.05),0 10px 30px rgba(21,32,43,.07);
+  --gx:max(16px, env(safe-area-inset-left)); --gy:max(16px, env(safe-area-inset-right));
+  --head:60px;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:var(--accent)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em;text-wrap:balance}
+p{margin:0}
+:focus-visible{outline:3px solid rgba(31,95,174,.45);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:var(--gx);padding-right:var(--gy)}
+.nw{white-space:nowrap}
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:10px;z-index:100;text-decoration:none}
+.skip:focus{top:12px}
+
+/* ribbon + header */
+.ribbon{background:var(--ink);color:#e9edf1;font-size:12.5px;line-height:1.35;text-align:center;padding:7px var(--gy) 7px var(--gx)}
+.ribbon b{color:#fff;font-weight:700}
+.top{position:sticky;top:0;z-index:50;background:rgba(245,243,238,.86);-webkit-backdrop-filter:saturate(1.5) blur(14px);backdrop-filter:saturate(1.5) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s,box-shadow .2s}
+.top.scrolled{border-bottom-color:var(--line);box-shadow:0 4px 18px rgba(21,32,43,.05)}
+.top .wrap{height:var(--head);display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);min-width:0}
+.brand svg{width:32px;height:32px;flex:none}
+.brand b{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.brand small{display:block;font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.01em;line-height:1.2;white-space:nowrap}
+@media (max-width:359px){.top .brand small{display:none}}
+.nav{display:none;gap:4px;margin-left:auto}
+.nav a{color:var(--ink-2);text-decoration:none;font-weight:600;font-size:14.5px;padding:8px 12px;border-radius:999px}
+.top .btn{margin-left:auto}
+@media (min-width:980px){.nav{display:flex}.top .btn{margin-left:8px}}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;border:1.5px solid transparent;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px;text-decoration:none;white-space:nowrap;transition:background .15s,transform .1s,box-shadow .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn:active{transform:scale(.98)}
+.btn-sm{min-height:40px;padding:0 16px;font-size:14.5px}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.7;cursor:progress}
+.linkbtn{background:none;border:0;padding:6px 2px;color:var(--accent);font-weight:700;font-size:15px;text-decoration:underline;text-underline-offset:3px;-webkit-tap-highlight-color:transparent}
+
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:#8a5a1d;background:var(--sun-soft);border:1px solid #f1d9bb;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--sun)}
+
+/* hero */
+.hero{padding:28px 0 8px}
+.hero .wrap{display:grid;gap:24px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(33px,8.4vw,58px);font-weight:800;margin:12px 0 14px}
+.hero h1 span{color:var(--accent)}
+.lead{font-size:17px;color:var(--ink-2);max-width:560px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.hero-cta .btn{flex:1 1 200px}
+.facts{list-style:none;margin:24px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.facts li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 12px 11px;font-size:13px;line-height:1.3;color:var(--muted)}
+.facts b{display:block;font-size:20px;color:var(--ink);font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.hero-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;display:grid;grid-template-columns:118px minmax(0,1fr);gap:14px;align-items:center}
+.hero-card .hc-svg{background:linear-gradient(#eef3f6,#f7f5f0);border-radius:var(--r-sm);padding:6px}
+.hero-card .hc-badge{grid-column:1/-1;justify-self:start}
+.hero-card h3{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.01em;margin:0 0 2px}
+.hc-conf{font-size:14.5px;font-weight:600;line-height:1.35}
+.hc-price{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:8px;line-height:1.1}
+.hc-price small{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0;display:block;margin-top:3px}
+.hc-link{display:inline-block;margin-top:8px;font-weight:700;font-size:14.5px;text-decoration:none}
+@media (min-width:980px){
+  .hero{padding:64px 0 24px}
+  .hero .wrap{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:56px;align-items:center}
+  .hero-cta .btn{flex:0 0 auto}
+  .hero-card{grid-template-columns:1fr;padding:22px}
+  .hero-card .hc-svg{padding:16px}
+  .hero-card .hc-svg svg{max-height:300px;margin:0 auto}
+}
+
+/* sections */
+.section{padding:56px 0 8px;scroll-margin-top:calc(var(--head) + 8px)}
+.sec-head{max-width:720px;margin-bottom:22px}
+.kicker{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.sec-head h2{font-size:clamp(28px,6.6vw,42px);font-weight:800;margin-bottom:10px}
+.sec-head p{color:var(--ink-2);font-size:16.5px}
+.sec-head .badge{margin-top:12px}
+.try{margin-top:12px;font-size:14.5px;color:var(--ink-2);background:var(--accent-soft);border-radius:var(--r-xs);padding:10px 14px;display:inline-block}
+.try b{color:var(--accent-dark)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+@media (min-width:980px){.section{padding:96px 0 8px}.sec-head{margin-bottom:32px}}
+
+/* calculator */
+.calc{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.calc > *{min-width:0}
+.calc-visual{padding:14px;scroll-margin-top:calc(var(--head) + 8px)}
+.tabs{min-width:0;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.tab{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line-2);background:var(--surface);font-weight:700;font-size:14px;color:var(--ink-2);white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.tab[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tab .q{opacity:.7;font-weight:600;margin-left:4px}
+.tab-add{border-style:dashed;color:var(--accent);border-color:#a9c1e0}
+.stage{background:linear-gradient(180deg,#edf2f5 0%,#f6f4ef 100%);border-radius:var(--r-sm);position:relative}
+.stage svg{width:100%;height:auto;max-height:290px;margin:0 auto}
+.stage .glass-tag{position:absolute;right:10px;top:10px;font-size:12px;font-weight:700;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--ink-2)}
+.vis-cap{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-top:12px}
+.vis-cap p{font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.4}
+.vis-cap .rm{flex:none;background:none;border:0;color:var(--err);font-weight:700;font-size:13.5px;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+.vis-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+.vis-total span{font-size:13.5px;color:var(--muted);font-weight:600}
+.vis-total b{font-size:20px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.flash{animation:flash 1.4s ease}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(31,95,174,.55)}30%{box-shadow:0 0 0 6px rgba(31,95,174,.28)}100%{box-shadow:var(--shadow)}}
+
+.calc-form{display:grid;gap:12px}
+fieldset{border:0;margin:0;padding:16px;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+legend{float:left;width:100%;padding:0;margin-bottom:12px;font-weight:800;font-size:16px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+legend small{font-weight:600;font-size:12.5px;color:var(--muted)}
+legend + *{clear:both}
+.opts{display:grid;gap:8px}
+.opts-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opts-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{position:relative;display:block;-webkit-tap-highlight-color:transparent}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt-body{display:flex;flex-direction:column;gap:3px;height:100%;border:1.5px solid var(--line-2);border-radius:var(--r-sm);padding:11px 12px;background:var(--surface);transition:border-color .15s,background .15s,box-shadow .15s}
+.opt-body b{font-size:14.5px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.opt-body small{font-size:12.5px;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
+.opt-ico{width:34px;height:40px;margin-bottom:4px}
+.ot-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+@media (max-width:379px){.opts-3{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:599px){
+  .opts-type{grid-template-columns:minmax(0,1fr)}
+  .opts-type .opt-body{flex-direction:row;align-items:center;gap:14px;padding:9px 14px}
+  .opts-type .opt-ico{margin:0;flex:none;width:30px;height:36px}
+}
+.opt input:checked + .opt-body{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt input:focus-visible + .opt-body{outline:3px solid rgba(31,95,174,.45);outline-offset:2px}
+.opt input:disabled + .opt-body{opacity:.45}
+.opt input:disabled{cursor:not-allowed}
+.tag{display:inline-block;align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ok);background:var(--ok-soft);border-radius:6px;padding:2px 6px;margin-top:3px}
+.swatch{width:26px;height:26px;border-radius:8px;border:1px solid rgba(0,0,0,.18);margin-bottom:4px}
+.sw-bialy{background:#f3f4f1}.sw-antracyt{background:#3a4046}.sw-dab{background:linear-gradient(115deg,#9c5f2a,#c08549 40%,#a86a32 65%,#c7904f)}
+.hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+.dim + .dim{margin-top:14px}
+.dim-top{display:flex;justify-content:space-between;align-items:baseline}
+.dim-top label{font-weight:700;font-size:14.5px}
+.dim-top output{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums}
+.dim-row{display:flex;align-items:center;gap:10px;margin-top:4px}
+.step{flex:none;width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line-2);background:var(--surface);font-size:22px;font-weight:600;line-height:1;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.step:active{background:var(--accent-soft)}
+.step:disabled{opacity:.35}
+.dim-scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:0 54px}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:36px;background:transparent;margin:0;--p:50%;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(to right,var(--accent) var(--p),var(--line) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--accent);margin-top:-11px;box-shadow:0 2px 6px rgba(21,32,43,.2)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:var(--accent)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 6px rgba(21,32,43,.2)}
+.qty-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.qty-row span{font-weight:700;font-size:14.5px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper output{min-width:36px;text-align:center;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+
+.checks{display:grid;gap:8px}
+.chk .opt-body{flex-direction:row;align-items:center;gap:12px}
+.chk .box{flex:none;width:24px;height:24px;border-radius:7px;border:1.5px solid var(--line-2);display:grid;place-items:center;background:#fff;transition:background .15s,border-color .15s}
+.chk .box svg{width:14px;height:14px;opacity:0}
+.chk input:checked + .opt-body .box{background:var(--accent);border-color:var(--accent)}
+.chk input:checked + .opt-body .box svg{opacity:1}
+.chk .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.chk .pr{flex:none;font-size:13px;font-weight:700;color:var(--ink-2);white-space:nowrap}
+.calc-reset{justify-self:start}
+
+.calc-result{padding:18px;scroll-margin-top:calc(var(--head) + 8px)}
+.res-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.res-head h3{font-size:16px;font-weight:800}
+.res-price{font-size:clamp(32px,9vw,44px);font-weight:800;letter-spacing:-.03em;margin-top:10px;line-height:1.05;font-variant-numeric:tabular-nums}
+.res-sub{color:var(--muted);font-weight:600;font-size:14px;margin-top:6px}
+.res-rows{margin:16px 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.res-rows li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.res-rows li span{color:var(--muted);font-weight:600}
+.res-rows li b{text-align:right;font-weight:700}
+.uw-sub{display:flex;align-items:center;justify-content:flex-end;gap:8px;font-size:13px;color:var(--muted);font-weight:600;margin-top:3px}
+.uw-meter{display:inline-block;width:44px;height:6px;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+.uw-meter i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#e4892f,#1d8556);border-radius:3px}
+details.break{margin-top:4px;border-bottom:1px solid var(--line)}
+details.break summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-weight:700;font-size:14.5px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+details.break summary::-webkit-details-marker{display:none}
+details.break summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .2s}
+details.break[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.break ul{list-style:none;margin:0 0 12px;padding:0}
+.break li{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:5px 0;color:var(--ink-2)}
+.break li b{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.res-cta{margin-top:16px}
+.res-note{font-size:13px;color:var(--muted);margin-top:10px;text-align:center}
+
+@media (min-width:980px){
+  .calc{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);grid-template-areas:"vis form" "vis res";gap:20px 28px;align-items:start}
+  .calc-visual{grid-area:vis;position:sticky;top:calc(var(--head) + 16px);padding:18px}
+  .calc-form{grid-area:form}
+  .calc-result{grid-area:res}
+  .stage svg{max-height:400px}
+}
+
+/* chat */
+.chat{max-width:780px;overflow:hidden}
+.chat-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.ava{flex:none;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1f5fae,#4a8fdb);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.chat-head b{display:block;font-size:15.5px}
+.chat-head small{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);font-weight:600}
+.chat-head small::before{content:"";width:7px;height:7px;border-radius:50%;background:#22b36b}
+.chat-log{height:300px;height:clamp(260px,40svh,440px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--surface-2)}
+.msg{max-width:88%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.5;animation:pop .25s ease both}
+.msg.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:6px}
+.msg.typing{display:flex;gap:5px;padding:14px 16px}
+.msg.typing span{width:7px;height:7px;border-radius:50%;background:#9aa4ad;animation:dot 1s infinite ease-in-out}
+.msg.typing span:nth-child(2){animation-delay:.15s}.msg.typing span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg-act{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--accent);background:var(--accent-soft);color:var(--accent-dark);font-weight:700;font-size:14px;-webkit-tap-highlight-color:transparent;text-align:left}
+.msg-act:active{transform:scale(.98)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.chip{min-height:38px;padding:0 13px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font-weight:600;font-size:14px;color:var(--ink);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.chip:disabled{opacity:.5}
+.chat-input{display:flex;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--line)}
+.chat-input input{flex:1;min-width:0;height:48px;border-radius:999px;border:1.5px solid var(--line-2);padding:0 18px;font-size:16px;background:#fff;-webkit-appearance:none;appearance:none}
+.chat-input input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,95,174,.18)}
+.send{flex:none;width:48px;height:48px;border-radius:50%;border:0;background:var(--accent);display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+.send svg{width:20px;height:20px}
+
+/* lead form + owner view */
+.lead-grid{display:grid;gap:16px}
+.lead-card{padding:18px}
+.sum{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px}
+.sum span{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em;text-transform:uppercase}
+.sum p{font-weight:700;font-size:15px;margin-top:4px;line-height:1.4}
+.sum a{font-size:14px;font-weight:700}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:700;font-size:14.5px;margin-bottom:6px}
+.field input{width:100%;height:50px;border-radius:var(--r-sm);border:1.5px solid var(--line-2);padding:0 14px;font-size:16px;background:#fff;-webkit-appearance:none;appearance:none}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,95,174,.18)}
+.field.invalid input{border-color:var(--err);background:var(--err-soft)}
+.err{display:none;color:var(--err);font-size:13.5px;font-weight:600;margin-top:6px}
+.field.invalid .err{display:block}
+.lead-actions{display:flex;flex-direction:column;align-items:center;gap:6px}
+.demo-note{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+.sent{display:none;text-align:center;padding:10px 4px}
+.sent .ok-ico{width:56px;height:56px;border-radius:50%;background:var(--ok-soft);display:grid;place-items:center;margin:0 auto 12px}
+.sent h3{font-size:21px;font-weight:800;margin-bottom:8px}
+.sent p{color:var(--ink-2);font-size:15px;margin-bottom:16px}
+.lead-card.is-sent form{display:none}
+.lead-card.is-sent .sent{display:block}
+.owner{padding:18px;scroll-margin-top:calc(var(--head) + 8px)}
+.owner-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.owner-head h3{font-size:17px;font-weight:800}
+.owner-empty{border:1.5px dashed var(--line-2);border-radius:var(--r-sm);padding:22px 18px;color:var(--muted);font-size:14.5px;text-align:center;background:var(--surface-2)}
+.owner-empty svg{width:40px;height:40px;margin:0 auto 10px;opacity:.6}
+.flow{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+.flow li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;transition-delay:calc(var(--i)*.45s)}
+.owner.run .flow li{opacity:1;transform:none}
+.flow .chk-ico{flex:none;width:22px;height:22px;border-radius:50%;background:var(--ok);display:grid;place-items:center;margin-top:1px}
+.flow .chk-ico svg{width:12px;height:12px}
+.flow small{display:block;color:var(--muted);font-size:12.5px;font-weight:600}
+.flow-title{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.mock-grid{display:grid;gap:12px}
+.mock{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s;transition-delay:calc(var(--i)*.45s)}
+.owner.run .mock{opacity:1;transform:none}
+.tg{border-radius:var(--r-sm);overflow:hidden;border:1px solid #cfdde8;background:#dfeaf2}
+.tg-head{display:flex;align-items:center;gap:10px;background:#fff;padding:10px 12px;border-bottom:1px solid #d6e2ea}
+.tg-head .ava{width:34px;height:34px;font-size:13px;background:linear-gradient(135deg,#2aabee,#1e88d6)}
+.tg-head b{display:block;font-size:14px}
+.tg-head small{font-size:12px;color:var(--muted)}
+.tg-body{padding:12px;background:#dbe8f0 radial-gradient(circle at 20% 20%,rgba(255,255,255,.5),transparent 40%)}
+.tg-msg{background:#fff;border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:13.5px;line-height:1.45;max-width:100%;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.tg-msg .from{color:#1e88d6;font-weight:700;font-size:13px;margin-bottom:2px}
+.tg-msg p + p{margin-top:6px}
+.tg-msg .time{text-align:right;font-size:11px;color:#8b98a3;margin-top:4px}
+.tg-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}
+.tg-btns span{background:rgba(255,255,255,.75);border-radius:8px;text-align:center;font-size:13px;font-weight:700;color:#1e88d6;padding:8px 4px}
+.crm{border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:#fff}
+.crm-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);font-weight:800;font-size:13.5px}
+.crm-head span{font-size:12px;color:var(--muted);font-weight:600}
+.crm-body{padding:12px}
+.crm-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.crm-title b{font-size:15px}
+.pill{font-size:11.5px;font-weight:800;color:#fff;background:var(--accent);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.crm dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;font-size:13.5px}
+.crm dt{color:var(--muted);font-weight:600}
+.crm dd{margin:0;font-weight:700;text-align:right}
+.sms{border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;padding:12px}
+.sms-head{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.sms-bubble{background:#e9e9eb;border-radius:16px 16px 16px 4px;padding:9px 12px;font-size:13.5px;line-height:1.45;color:#111}
+@media (min-width:760px){.mock-grid{grid-template-columns:1fr 1fr}.mock-grid .tg{grid-row:span 2}}
+@media (min-width:980px){.lead-grid{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:28px;align-items:start}.lead-card,.owner{padding:24px}}
+
+/* steps + warranty */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.steps li::before{counter-increment:s;content:counter(s);width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent-dark);font-weight:800;display:grid;place-items:center;font-size:17px}
+.steps b{display:block;font-size:16px;margin-bottom:3px}
+.steps p{font-size:14.5px;color:var(--ink-2)}
+.war{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.war div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 12px;text-align:center}
+.war b{display:block;font-size:clamp(26px,7vw,38px);font-weight:800;letter-spacing:-.03em;color:var(--accent)}
+.war span{font-size:13.5px;color:var(--ink-2);font-weight:600;line-height:1.3;display:block;margin-top:2px}
+.war-note{margin-top:12px;font-size:14.5px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+@media (min-width:980px){.steps{grid-template-columns:repeat(5,minmax(0,1fr))}.steps li{grid-template-columns:1fr;gap:12px}}
+
+/* footer */
+.foot{margin-top:64px;background:var(--ink);color:#c9d1d8;padding:36px 0 calc(28px + env(safe-area-inset-bottom))}
+.foot .brand{color:#fff}
+.foot .brand small{color:#9aa6b1}
+.foot p{font-size:14px;line-height:1.55;margin-top:14px;max-width:640px}
+.foot .contacts{color:#fff;font-weight:600}
+.foot .btn-ghost{color:#fff;border-color:#4a5866;margin-top:18px}
+.foot .copy{font-size:12.5px;color:#8995a0}
+
+/* mobile bar + toast */
+.mbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;align-items:center;gap:12px;padding:10px var(--gy) calc(10px + env(safe-area-inset-bottom)) var(--gx);background:rgba(255,255,255,.95);-webkit-backdrop-filter:saturate(1.5) blur(14px);backdrop-filter:saturate(1.5) blur(14px);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(21,32,43,.08);transform:translateY(110%);transition:transform .28s ease;visibility:hidden}
+.mbar.show{transform:none;visibility:visible}
+.mbar .mb-txt{flex:1;min-width:0;line-height:1.2}
+.mbar small{display:block;font-size:12px;color:var(--muted);font-weight:700}
+.mbar b{display:block;font-size:17.5px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.mbar .btn{min-height:46px;padding:0 18px;font-size:15px}
+@media (min-width:980px){.mbar{display:none}}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));z-index:70;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;font-weight:700;font-size:14.5px;padding:11px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.2);transition:opacity .25s,transform .25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (min-width:980px){.toast{bottom:28px}}
+
+@media (hover:hover){
+  .nav a:hover{background:rgba(21,32,43,.06)}
+  .btn:hover{background:var(--accent-dark)}
+  .btn-ghost:hover{background:rgba(21,32,43,.05)}
+  .chip:hover{border-color:var(--accent);color:var(--accent-dark)}
+  .foot .btn-ghost:hover{background:rgba(255,255,255,.08)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#kalkulator">Przejdź do kalkulatora</a>
+<div class="ribbon"><b>Projekt demonstracyjny.</b> Firma, ceny i zgłoszenia są fikcyjne.</div>
+
+<header class="top" id="header">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Widnok — na górę strony">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#1f5fae"/><rect x="8.5" y="8.5" width="15" height="15" rx="2" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M16 8.5v15M8.5 16h15" stroke="#fff" stroke-width="2.2"/></svg>
+      <span><b>Widnok</b><small>okna PCV · Kraków</small></span>
+    </a>
+    <nav class="nav" aria-label="Sekcje strony">
+      <a href="#kalkulator">Kalkulator</a>
+      <a href="#doradca">Doradca AI</a>
+      <a href="#etapy">Jak pracujemy</a>
+      <a href="#gwarancja">Gwarancja</a>
+    </nav>
+    <a class="btn btn-sm" href="#zgloszenie">Umów pomiar</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Okna PCV z montażem · Kraków i okolice</p>
+        <h1>Ciepłe okna z montażem w jeden dzień. <span>Cenę znasz w minutę.</span></h1>
+        <p class="lead">Wybierz typ, rozmiar i dodatki — kalkulator od razu pokaże cenę, ciepłochronność okna i termin montażu. Pomiar i wycena na piśmie są bezpłatne.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#kalkulator">Policz cenę okien</a>
+          <a class="btn btn-ghost" href="#doradca">Zapytaj doradcę AI</a>
+        </div>
+        <ul class="facts">
+          <li><b>10 lat</b>gwarancji na profil</li>
+          <li><b>1 dzień</b>montaż w mieszkaniu</li>
+          <li><b>0 zł</b>pomiar i wycena</li>
+        </ul>
+      </div>
+      <aside class="hero-card" aria-label="Przykładowa wycena">
+        <span class="badge hc-badge">Dane demonstracyjne</span>
+        <div class="hc-svg" id="hero-svg"></div>
+        <div>
+          <h3>Przykład: okno do pokoju</h3>
+          <p class="hc-conf">90&nbsp;×&nbsp;140&nbsp;cm · ciepły profil · 3&nbsp;szyby</p>
+          <p class="hc-price" id="hero-price">—<small>z montażem</small></p>
+          <a class="hc-link" href="#kalkulator">Policz swoje okna →</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 01 KALKULATOR -->
+  <section class="section" id="kalkulator">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">01 · Kalkulator</p>
+        <h2>Policz okna w minutę</h2>
+        <p>Stawki z naszego cennika. Zmieniasz parametry, a cena, ciepłochronność i termin przeliczają się od razu.</p>
+        <p class="try"><b>Wypróbuj:</b> dodaj drugie okno, wybierz drzwi balkonowe i kolor antracyt.</p>
+      </div>
+
+      <div class="calc">
+        <div class="card calc-visual" id="wizualizacja">
+          <div class="tabs" id="tabs" aria-label="Okna w zamówieniu"></div>
+          <div class="stage">
+            <div id="calc-svg"></div>
+            <span class="glass-tag" id="glass-tag">3 szyby</span>
+          </div>
+          <div class="vis-cap">
+            <p id="vis-caption"></p>
+            <button type="button" class="rm" id="remove-pos" hidden>Usuń</button>
+          </div>
+          <div class="vis-total"><span id="vis-count">Razem</span><b id="vis-price">—</b></div>
+        </div>
+
+        <form class="calc-form" id="calc-form" autocomplete="off" onsubmit="return false">
+          <fieldset>
+            <legend>Rodzaj</legend>
+            <div class="opts opts-3 opts-type">
+              <label class="opt"><input type="radio" name="type" value="jedno"><span class="opt-body">
+                <svg class="opt-ico" viewBox="0 0 34 40" aria-hidden="true"><rect x="5" y="3" width="24" height="34" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7l16 13L9 33" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2.5 2"/></svg>
+                <span class="ot-txt"><b>Jednoskrzydłowe</b><small>rozwierno-uchylne</small></span></span></label>
+              <label class="opt"><input type="radio" name="type" value="dwu"><span class="opt-body">
+                <svg class="opt-ico" viewBox="0 0 34 40" aria-hidden="true"><rect x="2" y="5" width="30" height="30" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 5v30" stroke="currentColor" stroke-width="2"/><path d="M5 9l9 11-9 11M29 9l-9 11 9 11" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2.5 2"/></svg>
+                <span class="ot-txt"><b>Dwuskrzydłowe</b><small>ze słupkiem ruchomym</small></span></span></label>
+              <label class="opt"><input type="radio" name="type" value="balkon"><span class="opt-body">
+                <svg class="opt-ico" viewBox="0 0 34 40" aria-hidden="true"><rect x="9" y="1" width="16" height="38" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4l10 16-10 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2.5 2"/></svg>
+                <span class="ot-txt"><b>Drzwi balkonowe</b><small>rozwierno-uchylne</small></span></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Wymiary <small>co 5 cm</small></legend>
+            <div class="dim">
+              <div class="dim-top"><label for="in-w">Szerokość</label><output id="out-w" for="in-w">150 cm</output></div>
+              <div class="dim-row">
+                <button type="button" class="step" data-step="w" data-d="-5" aria-label="Szerokość: mniej o 5 cm">−</button>
+                <input type="range" id="in-w" name="w" min="100" max="220" step="5" value="150">
+                <button type="button" class="step" data-step="w" data-d="5" aria-label="Szerokość: więcej o 5 cm">+</button>
+              </div>
+              <div class="dim-scale"><span id="min-w">100</span><span id="max-w">220 cm</span></div>
+            </div>
+            <div class="dim">
+              <div class="dim-top"><label for="in-h">Wysokość</label><output id="out-h" for="in-h">150 cm</output></div>
+              <div class="dim-row">
+                <button type="button" class="step" data-step="h" data-d="-5" aria-label="Wysokość: mniej o 5 cm">−</button>
+                <input type="range" id="in-h" name="h" min="80" max="170" step="5" value="150">
+                <button type="button" class="step" data-step="h" data-d="5" aria-label="Wysokość: więcej o 5 cm">+</button>
+              </div>
+              <div class="dim-scale"><span id="min-h">80</span><span id="max-h">170 cm</span></div>
+            </div>
+            <div class="qty-row">
+              <span id="qty-label">Liczba sztuk</span>
+              <div class="stepper">
+                <button type="button" class="step" data-qty="-1" aria-label="Jedna sztuka mniej">−</button>
+                <output id="out-qty" aria-labelledby="qty-label">1</output>
+                <button type="button" class="step" data-qty="1" aria-label="Jedna sztuka więcej">+</button>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Profil</legend>
+            <div class="opts opts-3">
+              <label class="opt"><input type="radio" name="profile" value="standard"><span class="opt-body"><b>Standard</b><small>70 mm · 5 komór</small></span></label>
+              <label class="opt"><input type="radio" name="profile" value="cieply"><span class="opt-body"><b>Ciepły</b><small>82 mm · 6 komór</small><span class="tag">Polecany</span></span></label>
+              <label class="opt"><input type="radio" name="profile" value="pasywny"><span class="opt-body"><b>Pasywny</b><small>92 mm · tylko z 3 szybami</small></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Pakiet szyb</legend>
+            <div class="opts opts-2">
+              <label class="opt"><input type="radio" name="glass" value="2"><span class="opt-body"><b>2 szyby</b><small>Ug 1,1 · do pomieszczeń nieogrzewanych</small></span></label>
+              <label class="opt"><input type="radio" name="glass" value="3"><span class="opt-body"><b>3 szyby</b><small>Ug 0,5 · cieplej przy oknie · +18%</small></span></label>
+            </div>
+            <p class="hint" id="glass-hint" hidden>Profil pasywny produkujemy tylko z pakietem 3-szybowym.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Kolor</legend>
+            <div class="opts opts-3">
+              <label class="opt"><input type="radio" name="color" value="bialy"><span class="opt-body"><span class="swatch sw-bialy"></span><b>Biały</b><small>w cenie</small></span></label>
+              <label class="opt"><input type="radio" name="color" value="antracyt"><span class="opt-body"><span class="swatch sw-antracyt"></span><b>Antracyt</b><small>RAL 7016 od zewnątrz · +15%</small></span></label>
+              <label class="opt"><input type="radio" name="color" value="dab"><span class="opt-body"><span class="swatch sw-dab"></span><b>Złoty dąb</b><small>okleina z obu stron · +20%</small></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Dodatki <small>do tego okna</small></legend>
+            <div class="checks">
+              <label class="opt chk"><input type="checkbox" name="parapet"><span class="opt-body"><span class="box"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>Parapet wewnętrzny</b><small id="parapet-note">konglomerat, z montażem</small></span><span class="pr">od 140 zł</span></span></label>
+              <label class="opt chk"><input type="checkbox" name="roleta"><span class="opt-body"><span class="box"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>Roleta zewnętrzna</b><small>nadstawna, na taśmę</small></span><span class="pr">od 690 zł</span></span></label>
+              <label class="opt chk"><input type="checkbox" name="moskit"><span class="opt-body"><span class="box"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>Moskitiera</b><small>ramkowa, zdejmowana</small></span><span class="pr">od 150 zł</span></span></label>
+            </div>
+          </fieldset>
+
+          <fieldset id="montaz-field">
+            <legend>Montaż <small>całe zamówienie</small></legend>
+            <div class="opts opts-2">
+              <label class="opt"><input type="radio" name="montaz" value="standard"><span class="opt-body"><b>Standardowy</b><small>pianka i silikon · <span class="nw">190 zł/szt.</span></small></span></label>
+              <label class="opt"><input type="radio" name="montaz" value="cieply"><span class="opt-body"><b>Ciepły montaż</b><small>z taśmami · <span class="nw">480 zł/szt.</span></small></span></label>
+            </div>
+            <div class="checks" style="margin-top:8px">
+              <label class="opt chk"><input type="checkbox" name="demontaz"><span class="opt-body"><span class="box"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="txt"><b>Demontaż i wywóz starych okien</b><small>razem z utylizacją</small></span><span class="pr">110 zł/szt.</span></span></label>
+            </div>
+          </fieldset>
+
+          <button type="button" class="linkbtn calc-reset" id="calc-reset">Zacznij od nowa</button>
+        </form>
+
+        <div class="card calc-result" id="wynik" aria-live="polite">
+          <div class="res-head"><h3>Orientacyjna wycena</h3><span class="badge">Dane demonstracyjne</span></div>
+          <p class="res-price" id="res-price">—</p>
+          <p class="res-sub" id="res-sub"></p>
+          <ul class="res-rows">
+            <li><span>Ciepłochronność</span><b id="res-uw"></b></li>
+            <li><span>Produkcja</span><b id="res-prod"></b></li>
+            <li><span>Najbliższy pomiar</span><b id="res-pomiar"></b></li>
+            <li><span>Montaż</span><b id="res-montaz"></b></li>
+          </ul>
+          <details class="break">
+            <summary>Z czego składa się cena</summary>
+            <ul id="res-break"></ul>
+          </details>
+          <a class="btn btn-block res-cta" href="#zgloszenie">Wyślij wycenę i umów pomiar</a>
+          <p class="res-note">Dokładną cenę zapisujemy w umowie po bezpłatnym pomiarze.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 DORADCA AI -->
+  <section class="section" id="doradca">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">02 · Doradca AI</p>
+        <h2>Zapytaj, zanim zadzwonisz</h2>
+        <p>Doradca zna nasz cennik i pytania, które klienci zadają najczęściej. Gdy coś poleci, jednym kliknięciem ustawi to w kalkulatorze.</p>
+        <span class="badge">Odpowiedzi przygotowane wcześniej</span>
+      </div>
+      <div class="card chat">
+        <div class="chat-head">
+          <span class="ava" aria-hidden="true">AI</span>
+          <div><b>Doradca Widnok</b><small>online · odpowiada od razu</small></div>
+        </div>
+        <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="Rozmowa z doradcą"></div>
+        <div class="chips" id="chips" aria-label="Podpowiedzi pytań"></div>
+        <form class="chat-input" id="chat-form" autocomplete="off">
+          <label for="chat-text" class="vh">Twoje pytanie</label>
+          <input id="chat-text" type="text" enterkeyhint="send" placeholder="Napisz pytanie, np. o szyby…" maxlength="200">
+          <button class="send" type="submit" aria-label="Wyślij pytanie"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h12M10.5 4.5L16 10l-5.5 5.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 ZGŁOSZENIE -->
+  <section class="section" id="zgloszenie">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">03 · Wycena na piśmie</p>
+        <h2>Wyślij wycenę i umów bezpłatny pomiar</h2>
+        <p>Zgłoszenie z Twoim wyliczeniem w tej samej sekundzie trafia do CRM i do działu sprzedaży w Telegramie. Zobaczysz też, jak to wygląda po stronie firmy.</p>
+      </div>
+      <div class="lead-grid">
+        <div class="card lead-card" id="lead-card">
+          <form id="lead-form" novalidate>
+            <div class="sum">
+              <span>Twoja wycena</span>
+              <p id="sum-text">—</p>
+              <a href="#kalkulator">Zmień w kalkulatorze</a>
+            </div>
+            <div class="field" id="f-name">
+              <label for="in-name">Imię</label>
+              <input id="in-name" name="name" type="text" autocomplete="given-name" placeholder="np. Anna" aria-describedby="err-name">
+              <p class="err" id="err-name">Wpisz imię.</p>
+            </div>
+            <div class="field" id="f-contact">
+              <label for="in-contact">Telefon lub Telegram</label>
+              <input id="in-contact" name="contact" type="text" autocomplete="tel" placeholder="+48 … albo @nazwa" aria-describedby="err-contact">
+              <p class="err" id="err-contact">Wpisz numer telefonu (9 cyfr) albo nazwę w Telegramie, np. @anna_k.</p>
+            </div>
+            <div class="lead-actions">
+              <button class="btn btn-block" type="submit" id="lead-submit">Wyślij wycenę</button>
+              <button class="linkbtn" type="button" id="fill-example">Uzupełnij przykładem</button>
+            </div>
+            <p class="demo-note">To demo: zgłoszenie nigdzie nie trafia.</p>
+          </form>
+          <div class="sent" id="sent" tabindex="-1">
+            <div class="ok-ico"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#1d8556" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3 id="sent-title">Zgłoszenie przyjęte</h3>
+            <p>To demo: zgłoszenie nigdzie nie trafiło. Zobacz, co w tej samej sekundzie dostała firma.</p>
+            <button class="btn btn-ghost" type="button" id="send-again">Wyślij jeszcze raz</button>
+          </div>
+        </div>
+
+        <div class="card owner" id="owner">
+          <div class="owner-head"><h3>Tak to widzi firma</h3><span class="badge">Dane demonstracyjne</span></div>
+          <div id="owner-body"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 ETAPY -->
+  <section class="section" id="etapy">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">04 · Jak pracujemy</p>
+        <h2>Od wyceny do montażu w około miesiąc</h2>
+      </div>
+      <ol class="steps">
+        <li><div><b>Wycena online</b><p>Na tej stronie: cena i termin w minutę.</p></div></li>
+        <li><div><b>Bezpłatny pomiar</b><p>Przyjeżdżamy w ciągu 2 dni roboczych, mierzymy i doradzamy na miejscu.</p></div></li>
+        <li><div><b>Umowa i produkcja</b><p>Cena zapisana w umowie. Produkcja trwa 3–4 tygodnie, kolor lub profil pasywny — tydzień dłużej.</p></div></li>
+        <li><div><b>Montaż w jeden dzień</b><p>Demontaż, montaż, obróbka ościeży i sprzątanie. Stare okna wywozimy.</p></div></li>
+        <li><div><b>Serwis</b><p>Pierwsza regulacja okuć po roku — bezpłatnie.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 05 GWARANCJA -->
+  <section class="section" id="gwarancja">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">05 · Gwarancja</p>
+        <h2>Gwarancja na piśmie</h2>
+      </div>
+      <div class="war">
+        <div><b>10 lat</b><span>profil i szyby</span></div>
+        <div><b>5 lat</b><span>okucia</span></div>
+        <div><b>3 lata</b><span>montaż</span></div>
+      </div>
+      <p class="war-note">Jeśli okno trzeba wyregulować albo coś przestało działać, zgłaszasz to przez formularz lub w Telegramie. Serwisant przyjeżdża w ciągu 5 dni roboczych.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Widnok — na górę strony">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#1f5fae"/><rect x="8.5" y="8.5" width="15" height="15" rx="2" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M16 8.5v15M8.5 16h15" stroke="#fff" stroke-width="2.2"/></svg>
+      <span><b>Widnok</b><small>okna PCV z montażem · Kraków i okolice</small></span>
+    </a>
+    <p class="contacts">widnok.demo · hello@widnok.demo · +48 000 000 000</p>
+    <p>Wszystkie ceny, liczby i zgłoszenia na tej stronie to dane demonstracyjne. Odpowiedzi doradcy AI są przygotowane wcześniej: w demo AI nie jest podłączone.</p>
+    <button class="btn btn-ghost btn-sm" type="button" id="reset-demo">Zresetuj demo</button>
+    <p class="copy">© 2026 Widnok — firma fikcyjna, strona demonstracyjna.</p>
+  </div>
+</footer>
+
+<div class="mbar" id="mbar">
+  <div class="mb-txt"><small id="mbar-count">Razem</small><b id="mbar-price">—</b></div>
+  <a class="btn" href="#zgloszenie">Wycena</a>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<noscript><p style="padding:16px;text-align:center">Kalkulator i doradca działają z włączonym JavaScriptem.</p></noscript>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const NB = ' ';
+const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, NB);
+const zl = n => num(n) + NB + 'zł';
+const dec = n => n.toFixed(1).replace('.', ',');
+const plural = (n, one, few, many) => {
+  if (n === 1) return one;
+  const a = n % 10, b = n % 100;
+  return (a >= 2 && a <= 4 && (b < 12 || b > 14)) ? few : many;
+};
+const round = (n, step) => Math.round(n / step) * step;
+
+/* ---------- dane (demonstracyjne) ---------- */
+const TYPES = {
+  jedno:  {name: 'Jednoskrzydłowe', w: [50, 120, 90],  h: [60, 160, 140], mult: 1.00, fixed: 180, sashes: 1},
+  dwu:    {name: 'Dwuskrzydłowe',   w: [100, 220, 150], h: [80, 170, 150], mult: 1.12, fixed: 300, sashes: 2},
+  balkon: {name: 'Drzwi balkonowe', w: [70, 110, 90],  h: [200, 240, 220], mult: 1.18, fixed: 280, sashes: 1, door: true}
+};
+const PROFILES = {
+  standard: {name: 'Standard', lower: 'profil standard', rate: 480, uw: {2: 1.1, 3: 0.9}, weeks: 0},
+  cieply:   {name: 'Ciepły',   lower: 'ciepły profil',   rate: 580, uw: {2: 1.0, 3: 0.8}, weeks: 0},
+  pasywny:  {name: 'Pasywny',  lower: 'profil pasywny',  rate: 740, uw: {3: 0.7}, weeks: 1}
+};
+const COLORS = {
+  bialy:    {name: 'Biały',     lower: 'biały',     add: 0,    weeks: 0, frame: '#f3f4f1', sash: '#fafbf8', stroke: '#bfc4bd', handle: '#9aa2a9'},
+  antracyt: {name: 'Antracyt',  lower: 'antracyt',  add: 0.15, weeks: 1, frame: '#3a4046', sash: '#444b52', stroke: '#22272b', handle: '#d5d9dd'},
+  dab:      {name: 'Złoty dąb', lower: 'złoty dąb', add: 0.20, weeks: 1, wood: true, stroke: '#6f4219', handle: '#e2cfa6'}
+};
+const MONTAZ = {standard: 190, cieply: 480};
+const DEMONTAZ = 110;
+const KEY = 'widnok-demo-v1';
+
+const newPos = (base) => ({type: 'jedno', w: 90, h: 140, qty: 1,
+  profile: base ? base.profile : 'cieply', glass: base ? base.glass : 3, color: base ? base.color : 'bialy',
+  parapet: true, roleta: false, moskit: false});
+const DEF = () => ({
+  positions: [{type: 'dwu', w: 150, h: 150, qty: 1, profile: 'cieply', glass: 3, color: 'bialy', parapet: true, roleta: false, moskit: false}],
+  sel: 0, montaz: 'standard', demontaz: true, lead: 1047
+});
+
+function validPos(p) {
+  if (!p || !TYPES[p.type] || !PROFILES[p.profile] || !COLORS[p.color]) return false;
+  const t = TYPES[p.type];
+  if (!(p.w >= t.w[0] && p.w <= t.w[1] && p.h >= t.h[0] && p.h <= t.h[1])) return false;
+  if (!(p.qty >= 1 && p.qty <= 20)) return false;
+  return p.glass === 2 || p.glass === 3;
+}
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && Array.isArray(s.positions) && s.positions.length && s.positions.length <= 6 && s.positions.every(validPos) && MONTAZ[s.montaz]) {
+      s.sel = Math.min(Math.max(0, s.sel | 0), s.positions.length - 1);
+      s.demontaz = !!s.demontaz; s.lead = s.lead | 0 || 1047;
+      return s;
+    }
+  } catch (e) {}
+  return DEF();
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+let state = load();
+const cur = () => state.positions[state.sel];
+
+/* ---------- wyliczenia ---------- */
+function unit(p) {
+  const t = TYPES[p.type], pr = PROFILES[p.profile], c = COLORS[p.color];
+  const area = p.w * p.h / 10000;
+  const frame = area * pr.rate * t.mult + t.fixed;
+  const glassAdd = p.glass === 3 ? frame * 0.18 : 0;
+  const colorAdd = (frame + glassAdd) * c.add;
+  let extras = 0;
+  if (p.parapet && !t.door) extras += Math.max(140, p.w / 100 * 190);
+  if (p.roleta) extras += Math.max(690, area * 560);
+  if (p.moskit) extras += 110 + area * 70;
+  return {area, frame, glassAdd, colorAdd, extras};
+}
+function totals() {
+  let n = 0, okna = 0, kolor = 0, dod = 0, area = 0, uwMin = 9, uwMax = 0, colorW = 0, pasW = 0;
+  for (const p of state.positions) {
+    const u = unit(p), q = p.qty;
+    n += q; area += u.area * q;
+    okna += (u.frame + u.glassAdd) * q; kolor += u.colorAdd * q; dod += u.extras * q;
+    const uw = PROFILES[p.profile].uw[p.glass];
+    uwMin = Math.min(uwMin, uw); uwMax = Math.max(uwMax, uw);
+    if (COLORS[p.color].weeks) colorW = 1;
+    if (PROFILES[p.profile].weeks) pasW = 1;
+  }
+  const montaz = n * MONTAZ[state.montaz];
+  const demontaz = state.demontaz ? n * DEMONTAZ : 0;
+  const total = okna + kolor + dod + montaz + demontaz;
+  const step = total >= 10000 ? 100 : 50;
+  return {n, area, okna, kolor, dod, montaz, demontaz, total,
+    lo: round(total * 0.93, step), hi: round(total * 1.08, step),
+    uwMin, uwMax, weeks: [3 + colorW + pasW, 4 + colorW + pasW]};
+}
+const uwLabel = uw => uw <= 0.75 ? 'pasywne' : uw <= 0.85 ? 'bardzo ciepłe' : uw <= 0.95 ? 'ciepłe' : 'standard';
+
+/* daty */
+const DAY = 864e5;
+function addWorkdays(d, n) { const r = new Date(d); while (n > 0) { r.setDate(r.getDate() + 1); const w = r.getDay(); if (w !== 0 && w !== 6) n--; } return r; }
+function nextWorkday(d) { const r = new Date(d); while (r.getDay() === 0 || r.getDay() === 6) r.setDate(r.getDate() + 1); return r; }
+const fWeek = new Intl.DateTimeFormat('pl-PL', {weekday: 'short', day: 'numeric', month: 'long'});
+const fDay = new Intl.DateTimeFormat('pl-PL', {day: 'numeric', month: 'long'});
+const fTime = new Intl.DateTimeFormat('pl-PL', {hour: '2-digit', minute: '2-digit'});
+function pomiarDate() { return addWorkdays(new Date(), 2); }
+function montazRange(weeks) {
+  const p = pomiarDate();
+  const a = nextWorkday(new Date(p.getTime() + weeks[0] * 7 * DAY));
+  const b = nextWorkday(new Date(p.getTime() + weeks[1] * 7 * DAY));
+  if (a.getMonth() === b.getMonth()) return a.getDate() + '–' + fDay.format(b);
+  return fDay.format(a) + ' – ' + fDay.format(b);
+}
+
+/* ---------- rysunek okna (SVG) ---------- */
+function windowSVG(p, uid, label, tight) {
+  const t = TYPES[p.type], c = COLORS[p.color];
+  const S = 1.15, VW = 360, VH = 360, F = 7, SA = 6.5;
+  const ww = p.w * S, wh = p.h * S;
+  const rolH = p.roleta ? 20 : 0;
+  const parOn = p.parapet && !t.door, parH = parOn ? 7 : 0;
+  const x0 = +((VW - ww) / 2 + 12).toFixed(1);
+  const y0 = +((VH - 30 - (rolH + wh + parH)) / 2 + rolH).toFixed(1);
+  const frameFill = c.wood ? `url(#${uid}-wood)` : c.frame;
+  const sashFill = c.wood ? `url(#${uid}-wood)` : c.sash;
+  const R = v => +v.toFixed(1);
+  const vb = tight
+    ? `${R(x0 - 40)} ${R(y0 - rolH - 8)} ${R(ww + 58)} ${R(rolH + wh + parH + 13 + 26)}`
+    : `0 0 ${VW} ${VH}`;
+  let s = `<svg viewBox="${vb}" role="img" aria-label="${esc(label)}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="${uid}-glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b6d4ea"/><stop offset=".55" stop-color="#d6e8f4"/><stop offset="1" stop-color="#edf5fa"/></linearGradient>
+    <linearGradient id="${uid}-wood" x1="0" y1="0" x2="1" y2=".3"><stop offset="0" stop-color="#9c5f2a"/><stop offset=".35" stop-color="#c08549"/><stop offset=".62" stop-color="#a86a32"/><stop offset="1" stop-color="#c7904f"/></linearGradient>
+    <pattern id="${uid}-mesh" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 0H4M0 0V4" stroke="#24313b" stroke-width=".6"/></pattern>
+  </defs>
+  <rect x="${R(x0 + 4)}" y="${R(y0 + 6)}" width="${R(ww)}" height="${R(wh)}" rx="3" fill="#15202b" opacity=".09"/>`;
+  if (rolH) {
+    const bx = x0 - 3, by = y0 - rolH;
+    s += `<rect x="${R(bx)}" y="${R(by)}" width="${R(ww + 6)}" height="${rolH}" rx="2.5" fill="${frameFill}" stroke="${c.stroke}"/>
+    <path d="M${R(bx + 6)} ${R(by + 8)}H${R(bx + ww)} M${R(bx + 6)} ${R(by + 13)}H${R(bx + ww)}" stroke="${c.stroke}" stroke-width=".8" opacity=".55"/>`;
+  }
+  s += `<rect x="${x0}" y="${y0}" width="${R(ww)}" height="${R(wh)}" rx="2" fill="${frameFill}" stroke="${c.stroke}"/>`;
+  const ix = x0 + F, iy = y0 + F, iw = ww - 2 * F, ih = wh - 2 * F;
+  const sashes = t.sashes === 2
+    ? [{x: ix, y: iy, w: iw / 2 - 1, h: ih, hinge: 'L', tilt: false}, {x: ix + iw / 2 + 1, y: iy, w: iw / 2 - 1, h: ih, hinge: 'R', tilt: true}]
+    : [{x: ix, y: iy, w: iw, h: ih, hinge: 'L', tilt: true}];
+  for (const sh of sashes) {
+    const g = {x: sh.x + SA, y: sh.y + SA, w: sh.w - 2 * SA, h: sh.h - 2 * SA};
+    s += `<rect x="${R(sh.x)}" y="${R(sh.y)}" width="${R(sh.w)}" height="${R(sh.h)}" rx="1.5" fill="${sashFill}" stroke="${c.stroke}" stroke-width=".9"/>
+    <rect x="${R(g.x)}" y="${R(g.y)}" width="${R(g.w)}" height="${R(g.h)}" fill="url(#${uid}-glass)" stroke="${c.stroke}" stroke-width=".6"/>
+    <polygon points="${R(g.x + g.w * .1)},${R(g.y + g.h)} ${R(g.x + g.w * .36)},${R(g.y + g.h)} ${R(g.x + g.w * .8)},${R(g.y)} ${R(g.x + g.w * .54)},${R(g.y)}" fill="#fff" opacity=".3"/>`;
+    if (p.moskit) s += `<rect x="${R(g.x)}" y="${R(g.y)}" width="${R(g.w)}" height="${R(g.h)}" fill="url(#${uid}-mesh)" opacity=".45"/>`;
+    let d;
+    if (sh.hinge === 'L') d = `M${R(g.x)} ${R(g.y)}L${R(g.x + g.w)} ${R(g.y + g.h / 2)}L${R(g.x)} ${R(g.y + g.h)}`;
+    else d = `M${R(g.x + g.w)} ${R(g.y)}L${R(g.x)} ${R(g.y + g.h / 2)}L${R(g.x + g.w)} ${R(g.y + g.h)}`;
+    if (sh.tilt) d += ` M${R(g.x)} ${R(g.y + g.h)}L${R(g.x + g.w / 2)} ${R(g.y)}L${R(g.x + g.w)} ${R(g.y + g.h)}`;
+    s += `<path d="${d}" fill="none" stroke="#1d2a35" stroke-opacity=".42" stroke-width=".9" stroke-dasharray="4 3"/>`;
+    const hx = sh.hinge === 'L' ? sh.x + sh.w - SA / 2 - 2 : sh.x + SA / 2 - 2;
+    const hy = t.door ? y0 + wh - 105 * S - 6 : sh.y + sh.h / 2 - 6;
+    s += `<rect x="${R(hx - .5)}" y="${R(hy - 2)}" width="5" height="8" rx="1.5" fill="${c.handle}" stroke="#1d2a35" stroke-opacity=".25" stroke-width=".5"/>
+    <rect x="${R(hx + .5)}" y="${R(hy + 2)}" width="3" height="17" rx="1.5" fill="${c.handle}" stroke="#1d2a35" stroke-opacity=".25" stroke-width=".5"/>`;
+  }
+  if (parOn) s += `<rect x="${R(x0 - 9)}" y="${R(y0 + wh)}" width="${R(ww + 18)}" height="${parH}" rx="1.5" fill="#dcd7cc" stroke="#b9b3a6" stroke-width=".8"/>`;
+  const yD = y0 + wh + parH + 13, xD = x0 - 20;
+  s += `<g stroke="#8a949c" stroke-width="1" fill="none">
+    <path d="M${x0} ${R(yD)}H${R(x0 + ww)} M${x0} ${R(yD - 5)}V${R(yD + 5)} M${R(x0 + ww)} ${R(yD - 5)}V${R(yD + 5)}"/>
+    <path d="M${R(xD)} ${y0}V${R(y0 + wh)} M${R(xD - 5)} ${y0}H${R(xD + 5)} M${R(xD - 5)} ${R(y0 + wh)}H${R(xD + 5)}"/>
+  </g>
+  <g font-family="Manrope,system-ui,sans-serif" font-size="13" font-weight="700" fill="#4f5b66" text-anchor="middle">
+    <text x="${R(x0 + ww / 2)}" y="${R(yD + 16)}">${p.w} cm</text>
+    <text transform="translate(${R(xD - 9)} ${R(y0 + wh / 2)}) rotate(-90)">${p.h} cm</text>
+  </g></svg>`;
+  return s;
+}
+
+/* ---------- render ---------- */
+const CF = $('#calc-form');
+const posLabel = p => `${TYPES[p.type].name} · ${p.w}${NB}×${NB}${p.h}${NB}cm · ${PROFILES[p.profile].lower} · ${p.glass}${NB}szyby · ${COLORS[p.color].lower}`;
+const countLabel = n => `${n} ${plural(n, 'okno', 'okna', 'okien')}`;
+
+function setRadio(name, v) { $$(`input[name="${name}"]`, CF).forEach(i => { i.checked = i.value === String(v); }); }
+
+function syncForm() {
+  const p = cur(), t = TYPES[p.type];
+  setRadio('type', p.type); setRadio('profile', p.profile); setRadio('glass', p.glass); setRadio('color', p.color); setRadio('montaz', state.montaz);
+  CF.elements.parapet.checked = p.parapet && !t.door;
+  CF.elements.parapet.disabled = !!t.door;
+  $('#parapet-note').textContent = t.door ? 'przy drzwiach balkonowych jest próg' : 'konglomerat, z montażem';
+  CF.elements.roleta.checked = p.roleta;
+  CF.elements.moskit.checked = p.moskit;
+  CF.elements.demontaz.checked = state.demontaz;
+  const g2 = $('input[name="glass"][value="2"]', CF);
+  g2.disabled = p.profile === 'pasywny';
+  $('#glass-hint').hidden = p.profile !== 'pasywny';
+  for (const k of ['w', 'h']) {
+    const r = $('#in-' + k), [mn, mx] = t[k];
+    r.min = mn; r.max = mx; r.value = p[k];
+    r.style.setProperty('--p', ((p[k] - mn) / (mx - mn) * 100) + '%');
+    $('#out-' + k).textContent = p[k] + ' cm';
+    $('#min-' + k).textContent = mn;
+    $('#max-' + k).textContent = mx + ' cm';
+    $$(`.step[data-step="${k}"]`).forEach(b => { b.disabled = (+b.dataset.d < 0 ? p[k] <= mn : p[k] >= mx); });
+  }
+  $('#out-qty').textContent = p.qty;
+  $$('.step[data-qty]').forEach(b => { b.disabled = (+b.dataset.qty < 0 ? p.qty <= 1 : p.qty >= 20); });
+}
+
+function renderTabs() {
+  const box = $('#tabs');
+  let h = state.positions.map((p, i) =>
+    `<button type="button" class="tab" data-tab="${i}" aria-pressed="${i === state.sel}">Okno ${i + 1}${p.qty > 1 ? `<span class="q">×${p.qty}</span>` : ''}</button>`).join('');
+  if (state.positions.length < 6) h += `<button type="button" class="tab tab-add" data-add="1">+ Dodaj okno</button>`;
+  box.innerHTML = h;
+  const rm = $('#remove-pos');
+  rm.hidden = state.positions.length < 2;
+  rm.textContent = `Usuń okno ${state.sel + 1}`;
+}
+
+function renderVisual() {
+  const p = cur();
+  const label = posLabel(p) + (p.roleta ? ' · roleta' : '') + (p.moskit ? ' · moskitiera' : '');
+  $('#calc-svg').innerHTML = windowSVG(p, 'c', 'Rysunek: ' + label);
+  $('#glass-tag').textContent = p.glass + ' szyby';
+  const extras = [p.parapet && !TYPES[p.type].door ? 'parapet' : '', p.roleta ? 'roleta' : '', p.moskit ? 'moskitiera' : ''].filter(Boolean);
+  $('#vis-caption').textContent = posLabel(p) + (extras.length ? ' · ' + extras.join(', ') : '') + (p.qty > 1 ? ` · ${p.qty} szt.` : '');
+}
+
+let shown = null;
+function setPrice(el, lo, hi) { el.textContent = num(lo) + '–' + num(hi) + NB + 'zł'; }
+function tweenPrice(lo, hi) {
+  const el = $('#res-price');
+  if (RM || !shown) { shown = {lo, hi}; setPrice(el, lo, hi); return; }
+  const from = {...shown}, t0 = performance.now(), dur = 280;
+  shown = {lo, hi};
+  const tick = now => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    setPrice(el, round(from.lo + (lo - from.lo) * e, 10), round(from.hi + (hi - from.hi) * e, 10));
+    if (k < 1 && shown.lo === lo && shown.hi === hi) requestAnimationFrame(tick);
+    else if (k >= 1) setPrice(el, lo, hi);
+  };
+  requestAnimationFrame(tick);
+}
+
+function renderResult() {
+  const T = totals();
+  const range = num(T.lo) + '–' + num(T.hi) + NB + 'zł';
+  tweenPrice(T.lo, T.hi);
+  $('#res-sub').textContent = `za ${countLabel(T.n)} · ${dec(T.area)} m² · z montażem`;
+  const uwTxt = T.uwMin === T.uwMax ? dec(T.uwMin) : dec(T.uwMin) + '–' + dec(T.uwMax);
+  const fill = Math.max(10, Math.min(100, (1.2 - T.uwMax) / 0.5 * 100));
+  $('#res-uw').innerHTML = `Uw ${uwTxt}${NB}W/(m²K)<small class="uw-sub">${uwLabel(T.uwMax)}<span class="uw-meter" aria-hidden="true"><i style="width:${fill}%"></i></span></small>`;
+  $('#res-prod').textContent = `${T.weeks[0]}–${T.weeks[1]} tygodnie`;
+  $('#res-pomiar').textContent = fWeek.format(pomiarDate());
+  $('#res-montaz').textContent = montazRange(T.weeks);
+  const lines = [
+    ['Okna: profil i szyby', T.okna],
+    ['Kolor (okleina)', T.kolor],
+    ['Dodatki', T.dod],
+    [state.montaz === 'cieply' ? 'Ciepły montaż' : 'Montaż standardowy', T.montaz],
+    ['Demontaż i wywóz', T.demontaz]
+  ].filter(l => l[1] > 0);
+  $('#res-break').innerHTML = lines.map(l => `<li><span>${l[0]}</span><b>${zl(round(l[1], 10))}</b></li>`).join('')
+    + `<li><span>Widełki ±8% do pomiaru</span><b>${range}</b></li>`;
+  $('#vis-count').textContent = 'Razem: ' + countLabel(T.n);
+  $('#vis-price').textContent = range;
+  $('#mbar-count').textContent = 'Razem · ' + countLabel(T.n);
+  $('#mbar-price').textContent = range;
+  $('#sum-text').textContent = `${countLabel(T.n)} · ${dec(T.area)} m² · ${range}`;
+  return T;
+}
+
+function update() { syncForm(); renderTabs(); renderVisual(); renderResult(); save(); }
+
+/* hero */
+(function hero() {
+  const p = {type: 'jedno', w: 90, h: 140, qty: 1, profile: 'cieply', glass: 3, color: 'bialy', parapet: false, roleta: false, moskit: false};
+  $('#hero-svg').innerHTML = windowSVG(p, 'h', 'Rysunek okna 90 na 140 cm', true);
+  const u = unit(p);
+  const price = round(u.frame + u.glassAdd + MONTAZ.standard, 10);
+  $('#hero-price').innerHTML = esc(zl(price)) + '<small>z montażem standardowym · Uw 0,8</small>';
+  hero.price = price;
+  window.__heroPrice = price;
+})();
+
+/* ---------- zdarzenia kalkulatora ---------- */
+CF.addEventListener('change', e => {
+  const el = e.target, p = cur();
+  switch (el.name) {
+    case 'type': { p.type = el.value; const t = TYPES[p.type]; p.w = t.w[2]; p.h = t.h[2]; if (t.door) p.parapet = false; else if (!p.parapet) p.parapet = true; break; }
+    case 'profile': p.profile = el.value; if (el.value === 'pasywny') p.glass = 3; break;
+    case 'glass': p.glass = +el.value; break;
+    case 'color': p.color = el.value; break;
+    case 'parapet': case 'roleta': case 'moskit': p[el.name] = el.checked; break;
+    case 'montaz': state.montaz = el.value; break;
+    case 'demontaz': state.demontaz = el.checked; break;
+    default: return;
+  }
+  update();
+});
+CF.addEventListener('input', e => {
+  if (e.target.type === 'range') { cur()[e.target.name] = +e.target.value; update(); }
+});
+CF.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const p = cur();
+  if (b.dataset.step) {
+    const k = b.dataset.step, [mn, mx] = TYPES[p.type][k];
+    p[k] = Math.min(mx, Math.max(mn, p[k] + +b.dataset.d)); update();
+  } else if (b.dataset.qty) {
+    p.qty = Math.min(20, Math.max(1, p.qty + +b.dataset.qty)); update();
+  }
+});
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.add) {
+    state.positions.push(newPos(cur()));
+    state.sel = state.positions.length - 1;
+    update(); toast(`Dodano okno ${state.sel + 1}`);
+  } else { state.sel = +b.dataset.tab; update(); }
+});
+$('#remove-pos').addEventListener('click', () => {
+  if (state.positions.length < 2) return;
+  const n = state.sel + 1;
+  state.positions.splice(state.sel, 1);
+  state.sel = Math.max(0, state.sel - 1);
+  update(); toast(`Usunięto okno ${n}`);
+});
+$('#calc-reset').addEventListener('click', () => {
+  const d = DEF(); state.positions = d.positions; state.sel = 0; state.montaz = d.montaz; state.demontaz = d.demontaz;
+  update(); toast('Kalkulator wyzerowany');
+});
+
+/* ---------- toast + przewijanie ---------- */
+let toastT;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function goTo(sel, msg) {
+  const el = $(sel);
+  el.scrollIntoView({behavior: RM ? 'auto' : 'smooth', block: 'start'});
+  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  setTimeout(() => el.classList.remove('flash'), 1500);
+  if (msg) toast(msg);
+}
+
+/* ---------- doradca AI (odpowiedzi przygotowane) ---------- */
+const QA = [
+  {id: 'szyby', q: 'Dwie czy trzy szyby?', keys: ['szyb', 'pakiet', 'ug'],
+    a: 'Do mieszkania lub domu, które ogrzewasz zimą, polecamy pakiet trzyszybowy. Ma współczynnik Ug około 0,5–0,6 zamiast 1,0–1,1 przy dwóch szybach, więc przez szybę ucieka mniej ciepła, a przy oknie jest cieplej w mroźne dni. Jest cięższy i droższy, w naszym cenniku o 18%. Dwie szyby mają sens tam, gdzie się nie grzeje: w garażu, altanie, na klatce schodowej.',
+    act: {label: 'Ustaw 3 szyby w kalkulatorze', fn() { const p = cur(); p.glass = 3; update(); goTo('#wizualizacja', 'Ustawiono: 3 szyby'); }}},
+  {id: 'montaz', q: 'Co to jest ciepły montaż?', keys: ['cieply montaz', 'montaz cieply', 'tasm', 'warstw', 'montaz'],
+    a: 'To montaż z taśmami: od środka paroszczelną, od zewnątrz paroprzepuszczalną, a między nimi pianka. Taśmy chronią piankę przed wilgocią, więc z czasem nie traci właściwości i przy oknie nie robi się zimny mostek. Najwięcej daje w domach i przy ciepłych oknach — inaczej część zysku z dobrego profilu ucieka przez złącze. U nas to 480 zł za sztukę zamiast 190 zł.',
+    act: {label: 'Włącz ciepły montaż', fn() { state.montaz = 'cieply'; update(); goTo('#wynik', 'Ustawiono: ciepły montaż'); }}},
+  {id: 'dom', q: 'Dom z lat 90. — co wybrać?', keys: ['dom', 'lat 90', '90', 'stary', 'co wybrac', 'polec', 'doradz'],
+    a: 'W takim domu zwykle wymienia się okna na ciepły profil 82 mm z trzema szybami i ciepłym montażem. To rozsądny środek między ceną a oszczędnością na ogrzewaniu. Profil pasywny opłaca się głównie w nowym domu, który od początku jest dobrze ocieplony. Ustawię tę konfigurację w kalkulatorze, a rozmiar zmienisz sam.',
+    act: {label: 'Ustaw: ciepły profil, 3 szyby, ciepły montaż', fn() { const p = cur(); p.profile = 'cieply'; p.glass = 3; state.montaz = 'cieply'; update(); goTo('#wizualizacja', 'Ustawiono konfigurację do domu'); }}},
+  {id: 'czas', q: 'Ile trwa wymiana okien?', keys: ['ile trwa', 'termin', 'kiedy', 'czas', 'dlugo', 'tydzien', 'tygod'],
+    a: 'Montaż jednego okna to zwykle 1–2 godziny, całe mieszkanie robimy w jeden dzień. Wcześniej jest bezpłatny pomiar, a potem produkcja: 3–4 tygodnie dla białych okien, o tydzień dłużej przy kolorowej okleinie lub profilu pasywnym. Termin dla Twojej konfiguracji widać w kalkulatorze.',
+    act: {label: 'Pokaż mój termin', fn() { goTo('#wynik'); }}},
+  {id: 'kolor', q: 'Antracyt czy biały?', keys: ['kolor', 'antracyt', 'bial', 'dab', 'okleina', 'ral', 'szary'],
+    a: 'Antracyt to okleina w kolorze RAL 7016, zwykle tylko od zewnątrz — od środka okno zostaje białe. Wygląda nowocześnie, szczególnie przy jasnej elewacji. Okleina podnosi cenę o 15% i wydłuża produkcję o tydzień. Biały jest najtańszy i najszybszy.',
+    act: {label: 'Pokaż okno w antracycie', fn() { const p = cur(); p.color = 'antracyt'; update(); goTo('#wizualizacja', 'Ustawiono: antracyt'); }}},
+  {id: 'pomiar', q: 'Czy pomiar jest płatny?', keys: ['pomiar', 'bezplat', 'zmierz', 'platn'],
+    a: 'Nie. Pomiar i wycena na piśmie są bezpłatne i do niczego nie zobowiązują. Wystarczy wysłać zgłoszenie z kalkulatora — oddzwonimy i ustalimy godzinę.',
+    act: {label: 'Przejdź do zgłoszenia', fn() { goTo('#zgloszenie'); }}},
+  {id: 'cena', q: null, keys: ['cena', 'koszt', 'kosztuje', 'drogo', 'tanio', 'ile za', 'zl'],
+    a: () => `Cena zależy od rozmiaru, profilu i dodatków, dlatego najprościej policzyć ją w kalkulatorze. Przykład: okno 90 × 140 cm w ciepłym profilu z 3 szybami kosztuje u nas około ${zl(window.__heroPrice)} z montażem. Dokładną cenę zapisujemy w umowie po bezpłatnym pomiarze.`,
+    act: {label: 'Przejdź do kalkulatora', fn() { goTo('#wizualizacja'); }}}
+];
+const FALLBACK = 'W tym demo odpowiadam tylko na przygotowane pytania — wybierz jedno z podpowiedzi poniżej. W prawdziwej wersji doradca odpowiada na dowolne pytanie i zna cały cennik.';
+const GREETING = 'Dzień dobry! Jestem doradcą Widnok. Pomogę dobrać okna i od razu ustawię je w kalkulatorze. Wybierz pytanie poniżej albo napisz własne.';
+const norm = s => s.toLowerCase().replace(/ł/g, 'l').normalize('NFD').replace(/[̀-ͯ]/g, '');
+const log = $('#chat-log'), chips = $('#chips');
+let busy = false;
+
+function addMsg(cls, text) {
+  const d = document.createElement('div'); d.className = 'msg ' + cls;
+  if (text) { const p = document.createElement('p'); p.textContent = text; d.appendChild(p); }
+  log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+}
+function renderChips() {
+  chips.innerHTML = QA.filter(q => q.q).map(q => `<button type="button" class="chip" data-q="${q.id}">${esc(q.q)}</button>`).join('');
+}
+function setBusy(v) { busy = v; $$('.chip', chips).forEach(b => { b.disabled = v; }); $('#chat-form button').disabled = v; }
+async function answer(qa, userText) {
+  if (busy) return;
+  setBusy(true);
+  addMsg('user', userText);
+  const typing = addMsg('bot typing'); typing.innerHTML = '<span></span><span></span><span></span>';
+  typing.setAttribute('aria-label', 'Doradca pisze');
+  await wait(RM ? 0 : 750);
+  typing.remove();
+  const m = addMsg('bot'); const p = document.createElement('p'); m.appendChild(p);
+  const text = qa ? (typeof qa.a === 'function' ? qa.a() : qa.a) : FALLBACK;
+  if (RM) p.textContent = text;
+  else {
+    const words = text.split(' ');
+    for (let i = 0; i < words.length; i++) {
+      p.textContent += (i ? ' ' : '') + words[i];
+      if (i % 2 === 1) { log.scrollTop = log.scrollHeight; await wait(18); }
+    }
+  }
+  if (qa && qa.act) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'msg-act';
+    b.textContent = qa.act.label + ' →'; b.addEventListener('click', () => qa.act.fn());
+    m.appendChild(b);
+  }
+  log.scrollTop = log.scrollHeight;
+  setBusy(false);
+}
+function match(text) {
+  const t = norm(text); let best = null, score = 0;
+  for (const q of QA) {
+    const s = q.keys.reduce((a, k) => a + (t.includes(k) ? k.length : 0), 0);
+    if (s > score) { score = s; best = q; }
+  }
+  return best;
+}
+function resetChat() { log.innerHTML = ''; addMsg('bot', GREETING); renderChips(); setBusy(false); }
+chips.addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b || busy) return;
+  const qa = QA.find(q => q.id === b.dataset.q); answer(qa, qa.q);
+});
+$('#chat-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const inp = $('#chat-text'), v = inp.value.trim();
+  if (!v || busy) return;
+  inp.value = '';
+  answer(match(v), v);
+});
+
+/* ---------- zgłoszenie + widok firmy ---------- */
+const LF = $('#lead-form'), card = $('#lead-card'), owner = $('#owner');
+const CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.3l2.6 2.6L10 3.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function ownerEmpty() {
+  owner.classList.remove('run');
+  $('#owner-body').innerHTML = `<div class="owner-empty"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="8" width="32" height="24" rx="4" fill="none" stroke="#65707b" stroke-width="2"/><path d="M4 14l16 9 16-9" fill="none" stroke="#65707b" stroke-width="2"/></svg>Wyślij zgłoszenie albo kliknij „Uzupełnij przykładem” i „Wyślij wycenę”. Tutaj zobaczysz, co w tej samej sekundzie automatycznie dzieje się po stronie firmy.</div>`;
+}
+function setErr(id, on) {
+  const f = $('#f-' + id); f.classList.toggle('invalid', on);
+  $('input', f).setAttribute('aria-invalid', on ? 'true' : 'false');
+}
+function validate() {
+  const name = LF.elements.name.value.trim(), contact = LF.elements.contact.value.trim();
+  const okName = name.length >= 2;
+  const digits = contact.replace(/\D/g, '');
+  const okContact = (digits.length >= 9 && digits.length <= 15 && /^[+\d\s()-]+$/.test(contact)) || /^@[a-z0-9_]{4,32}$/i.test(contact);
+  setErr('name', !okName); setErr('contact', !okContact);
+  return okName && okContact ? {name, contact} : null;
+}
+['name', 'contact'].forEach(n => LF.elements[n].addEventListener('input', () => { if ($('#f-' + n).classList.contains('invalid')) validate(); }));
+$('#fill-example').addEventListener('click', () => {
+  LF.elements.name.value = 'Anna Kowalska'; LF.elements.contact.value = '+48 512 345 678';
+  setErr('name', false); setErr('contact', false);
+});
+LF.addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = validate();
+  if (!data) { const bad = $('.field.invalid input', LF); if (bad) bad.focus(); return; }
+  const btn = $('#lead-submit'); btn.disabled = true; btn.textContent = 'Wysyłanie…';
+  await wait(RM ? 0 : 800);
+  btn.disabled = false; btn.textContent = 'Wyślij wycenę';
+  state.lead += 1; save();
+  showSent(data);
+});
+$('#send-again').addEventListener('click', () => { card.classList.remove('is-sent'); ownerEmpty(); LF.elements.name.focus({preventScroll: true}); });
+
+function showSent(d) {
+  const T = totals(), no = '#' + state.lead, now = new Date();
+  const call = new Date(now.getTime() + 15 * 60 * 1000);
+  const first = d.name.split(/\s+/)[0];
+  const mid = round((T.lo + T.hi) / 2, 10);
+  const pos = state.positions.map(p =>
+    `• ${TYPES[p.type].name} ${p.w}×${p.h}, ${PROFILES[p.profile].name.toLowerCase()}, ${p.glass} szyby${p.color !== 'bialy' ? ', ' + COLORS[p.color].lower : ''} — ${p.qty} szt.`);
+  const range = num(T.lo) + '–' + num(T.hi) + NB + 'zł';
+  $('#sent-title').textContent = `Zgłoszenie ${no} przyjęte`;
+  card.classList.add('is-sent');
+  $('#owner-body').innerHTML = `
+    <p class="flow-title">Automatycznie, w 1 sekundę</p>
+    <ol class="flow">
+      <li style="--i:0"><span class="chk-ico">${CHECK}</span><span>Klient zapisany w CRM razem z wyliczeniem<small>0,3 s</small></span></li>
+      <li style="--i:1"><span class="chk-ico">${CHECK}</span><span>Powiadomienie w grupie sprzedaży w Telegramie<small>0,5 s</small></span></li>
+      <li style="--i:2"><span class="chk-ico">${CHECK}</span><span>SMS do klienta z numerem zgłoszenia<small>0,8 s</small></span></li>
+      <li style="--i:3"><span class="chk-ico">${CHECK}</span><span>Zadanie dla handlowca: oddzwonić do ${fTime.format(call)}<small>1,0 s</small></span></li>
+    </ol>
+    <div class="mock-grid">
+      <div class="mock tg" style="--i:1">
+        <div class="tg-head"><span class="ava" aria-hidden="true">W</span><div><b>Widnok · Sprzedaż</b><small>grupa · 4 osoby</small></div></div>
+        <div class="tg-body"><div class="tg-msg">
+          <p class="from">Widnok Bot</p>
+          <p><b>🪟 Nowe zgłoszenie ${no}</b></p>
+          <p>👤 ${esc(d.name)}<br>📞 ${esc(d.contact)}</p>
+          <p>${pos.slice(0, 4).map(esc).join('<br>')}${pos.length > 4 ? `<br>+ ${pos.length - 4} więcej` : ''}</p>
+          <p>💰 ${range}<br>🔧 ${state.montaz === 'cieply' ? 'ciepły montaż' : 'montaż standardowy'}${state.demontaz ? ' + demontaż' : ''}<br>📅 pomiar od: ${fWeek.format(pomiarDate())}</p>
+          <p class="time">Źródło: kalkulator · ${fTime.format(now)}</p>
+        </div>
+        <div class="tg-btns"><span>📞 Dzwonię</span><span>📅 Umów pomiar</span></div></div>
+      </div>
+      <div class="mock crm" style="--i:2">
+        <div class="crm-head">CRM · karta klienta<span>dziś, ${fTime.format(now)}</span></div>
+        <div class="crm-body">
+          <div class="crm-title"><b>${no} · ${esc(d.name)}</b><span class="pill">Nowe</span></div>
+          <dl>
+            <dt>Wartość</dt><dd>${zl(mid)}</dd>
+            <dt>Okna</dt><dd>${countLabel(T.n)} · ${dec(T.area)} m²</dd>
+            <dt>Źródło</dt><dd>kalkulator na stronie</dd>
+            <dt>Handlowiec</dt><dd>Marek · przydział automatyczny</dd>
+            <dt>Zadanie</dt><dd>oddzwonić do ${fTime.format(call)}</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="mock sms" style="--i:3">
+        <p class="sms-head">SMS do klienta</p>
+        <p class="sms-bubble">Widnok: Dziękujemy, ${esc(first)}! Zgłoszenie ${no} przyjęte. Oddzwonimy w ciągu 15 minut w godzinach pracy.</p>
+      </div>
+    </div>`;
+  owner.classList.remove('run'); void owner.offsetWidth;
+  requestAnimationFrame(() => owner.classList.add('run'));
+  $('#sent').focus({preventScroll: true});
+  if (window.innerWidth < 980) setTimeout(() => owner.scrollIntoView({behavior: RM ? 'auto' : 'smooth', block: 'start'}), 350);
+}
+
+/* ---------- reset demo ---------- */
+$('#reset-demo').addEventListener('click', () => {
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  state = DEF(); shown = null; update();
+  resetChat(); LF.reset(); setErr('name', false); setErr('contact', false);
+  card.classList.remove('is-sent'); ownerEmpty();
+  window.scrollTo({top: 0, behavior: RM ? 'auto' : 'smooth'});
+  toast('Demo zresetowane');
+});
+
+/* ---------- nagłówek + pasek mobilny ---------- */
+const header = $('#header'), mbar = $('#mbar'), heroEl = $('#top');
+let formVis = false, footVis = false;
+function onScroll() {
+  header.classList.toggle('scrolled', window.scrollY > 4);
+  const past = window.scrollY > heroEl.offsetTop + heroEl.offsetHeight * 0.7;
+  mbar.classList.toggle('show', past && !formVis && !footVis);
+}
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(es => {
+    for (const en of es) { if (en.target.id === 'zgloszenie') formVis = en.isIntersecting; else footVis = en.isIntersecting; }
+    onScroll();
+  }).observe($('#zgloszenie'));
+  const io2 = new IntersectionObserver(es => { for (const en of es) footVis = en.isIntersecting; onScroll(); });
+  io2.observe($('.foot'));
+}
+let ticking = false;
+window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { onScroll(); ticking = false; }); } }, {passive: true});
+
+/* ---------- start ---------- */
+update(); resetChat(); ownerEmpty(); onScroll();
+})();
+</script>
+</body>
+</html>
